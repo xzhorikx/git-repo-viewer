@@ -1,7 +1,7 @@
 package alex.zhurkov.git_repo_viewer.data.usecase
 
 import alex.zhurkov.git_repo_viewer.domain.model.GitHubReposPage
-import alex.zhurkov.git_repo_viewer.domain.model.RepoTimeframe
+import alex.zhurkov.git_repo_viewer.domain.model.RepoFilter
 import alex.zhurkov.git_repo_viewer.domain.repository.GitHubRepoRepository
 import alex.zhurkov.git_repo_viewer.domain.usecase.GitHubReposUseCase
 
@@ -11,14 +11,11 @@ class GitHubReposUseCaseImpl(
 
     override suspend fun getRepoPage(
         pageId: Int,
-        repoTimeframe: RepoTimeframe,
+        repoFilter: RepoFilter,
         skipCache: Boolean
-    ): GitHubReposPage.Timeframe = gitHubRepository.getRepoPage(
+    ): GitHubReposPage? = gitHubRepository.getRepoPage(
         pageId = pageId,
-        repoTimeframe = repoTimeframe,
+        repoFilter = repoFilter,
         skipCache = skipCache
     )
-
-    override suspend fun getFavorites(pageId: Int): GitHubReposPage.Favorite? =
-        gitHubRepository.getFavorites(pageId = pageId)
 }

@@ -9,7 +9,7 @@ import alex.zhurkov.git_repo_viewer.data.database.mapper.OwnerEntityMapper
 import alex.zhurkov.git_repo_viewer.data.mapper.GitHubRepoResponseMapper
 import alex.zhurkov.git_repo_viewer.data.remote.GitHubRemoteSource
 import alex.zhurkov.git_repo_viewer.data.remote.GitHubRepositoryImpl
-import alex.zhurkov.git_repo_viewer.data.remote.model.GitHubRepoResponse
+import alex.zhurkov.git_repo_viewer.data.remote.model.GitHubPageResponse
 import alex.zhurkov.git_repo_viewer.data.source.ConfigSourceImpl
 import alex.zhurkov.git_repo_viewer.data.source.GitHubLocalSource
 import alex.zhurkov.git_repo_viewer.data.source.GitHubLocalSourceImpl
@@ -30,7 +30,7 @@ class GitHubDataModule {
         configSource: ConfigSource,
         localSource: GitHubLocalSource,
         remoteSource: GitHubRemoteSource,
-        repoRemoteMapper: Mapper<GitHubRepoResponse, GitHubRepo>
+        repoRemoteMapper: Mapper<GitHubPageResponse, GitHubRepo>
     ): GitHubRepoRepository = GitHubRepositoryImpl(
         configSource = configSource,
         localSource = localSource,
@@ -68,6 +68,6 @@ class GitHubDataModule {
 
     @Provides
     @Singleton
-    fun repoResponseMapper(): Mapper<GitHubRepoResponse, GitHubRepo> = GitHubRepoResponseMapper()
+    fun repoResponseMapper(): Mapper<GitHubPageResponse, GitHubRepo> = GitHubRepoResponseMapper()
 
 }

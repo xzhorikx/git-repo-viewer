@@ -3,12 +3,15 @@
 package alex.zhurkov.git_repo_viewer.feature.main
 
 import alex.zhurkov.git_repo_viewer.R
+import alex.zhurkov.git_repo_viewer.common.arch.UIEvent
 import alex.zhurkov.git_repo_viewer.feature.main.di.MainActivityComponent
+import alex.zhurkov.git_repo_viewer.feature.main.presentation.MainActivityEvent
 import alex.zhurkov.git_repo_viewer.feature.main.presentation.MainActivityViewModel
 import alex.zhurkov.git_repo_viewer.feature.main.presentation.MainActivityViewModelFactory
 import alex.zhurkov.git_repo_viewer.feature.main.views.MainScreen
-import alex.zhurkov.git_repo_viewer.ui.theme.GitrepoviewerTheme
+import alex.zhurkov.git_repo_viewer.ui.theme.GitRepoViewerTheme
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -21,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Observer
 import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,11 +40,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        component.inject(this)
+        viewModel.observableEvents.observe(this, Observer(::renderEvent))
         setContent {
             val context = LocalContext.current
             val scrollBehavior =
                 TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-            GitrepoviewerTheme {
+            GitRepoViewerTheme {
                 // A surface container using the 'background' color from the theme
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -67,6 +73,20 @@ class MainActivity : ComponentActivity() {
                         onLastItemVisible = {},
                         onClick = {}
                     )
+                }
+            }
+        }
+    }
+
+    private fun renderEvent(event: UIEvent) {
+        if (event is MainActivityEvent) {
+            when (event) {
+                is MainActivityEvent.DisplayError -> {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.error_message_template, event.e),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }

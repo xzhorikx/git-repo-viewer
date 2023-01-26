@@ -1,12 +1,12 @@
 package alex.zhurkov.git_repo_viewer.data.remote
 
-import alex.zhurkov.git_repo_viewer.data.remote.model.GitHubRepoResponse
+import alex.zhurkov.git_repo_viewer.data.remote.model.GitHubPageResponse
 import alex.zhurkov.git_repo_viewer.data.source.GitHubLocalSource
 import alex.zhurkov.git_repo_viewer.domain.config.ConfigSource
 import alex.zhurkov.git_repo_viewer.domain.mapper.Mapper
 import alex.zhurkov.git_repo_viewer.domain.model.GitHubRepo
 import alex.zhurkov.git_repo_viewer.domain.model.GitHubReposPage
-import alex.zhurkov.git_repo_viewer.domain.model.RepoTimeframe
+import alex.zhurkov.git_repo_viewer.domain.model.RepoFilter
 import alex.zhurkov.git_repo_viewer.domain.model.asIsoDateFromNow
 import alex.zhurkov.git_repo_viewer.domain.repository.GitHubRepoRepository
 
@@ -16,18 +16,37 @@ class GitHubRepositoryImpl(
     private val configSource: ConfigSource,
     private val localSource: GitHubLocalSource,
     private val remoteSource: GitHubRemoteSource,
-    private val repoRemoteMapper: Mapper<GitHubRepoResponse, GitHubRepo>
+    private val repoRemoteMapper: Mapper<GitHubPageResponse, GitHubRepo>
 ) : GitHubRepoRepository {
     override suspend fun getRepoPage(
         pageId: Int,
-        repoTimeframe: RepoTimeframe,
+        repoFilter: RepoFilter,
         skipCache: Boolean
-    ): GitHubReposPage.Timeframe {
+    ): GitHubReposPage? {
         val limit = configSource.pageSize
+        return when (repoFilter) {
+            RepoFilter.Favorites -> getFavorites(pageId = pageId, limit = limit)
+            is RepoFilter.TimeFrame -> {
+                getTimeframePage(
+                    pageId = pageId,
+                    limit = limit,
+                    repoFilter = repoFilter,
+                    skipCache = skipCache
+                )
+            }
+        }
+    }
+
+    private suspend fun getTimeframePage(
+        pageId: Int,
+        limit: Int,
+        repoFilter: RepoFilter.TimeFrame,
+        skipCache: Boolean
+    ): GitHubReposPage {
         val localPage = when (skipCache) {
             true -> null
             false -> localSource.getPage(
-                page = pageId, repoTimeframe = repoTimeframe, limit = limit
+                page = pageId, filter = repoFilter, limit = limit
             )
         }
 
@@ -38,21 +57,21 @@ class GitHubRepositoryImpl(
             false -> "public, max-stale=${configSource.cacheStaleSec}"
         }
         val response = remoteSource.getRepositoriesPage(
-            q = "created: >${repoTimeframe.asIsoDateFromNow()}",
+            q = "created:>${repoFilter.asIsoDateFromNow()}",
             sort = SORT_STARS,
             limit = configSource.pageSize,
             page = pageId,
             cacheControl = cacheControl
-        )
-        return GitHubReposPage.Timeframe(
+        ).items
+        return GitHubReposPage(
             pageId = pageId,
             isLastPage = response.isEmpty(),
             repos = response.map(repoRemoteMapper::map),
-            timeframe = repoTimeframe
+            repoFilter = repoFilter
         ).also { localSource.savePage(it) }
     }
 
-    override suspend fun getFavorites(pageId: Int): GitHubReposPage.Favorite? =
-        localSource.getFavorites(page = pageId, limit = configSource.pageSize)
+    private suspend fun getFavorites(pageId: Int, limit: Int): GitHubReposPage? =
+        localSource.getFavorites(page = pageId, limit = limit)
 
 }

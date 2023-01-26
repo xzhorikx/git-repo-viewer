@@ -12,7 +12,7 @@ sealed class GitHubRepoItem {
         val owner: OwnerItem,
         val name: String,
         val url: String,
-        val description: String,
+        val description: String?,
         val stars: Int
     ) : GitHubRepoItem()
 
@@ -24,6 +24,6 @@ fun GitHubRepo.toItem(): GitHubRepoItem.Data = GitHubRepoItem.Data(
     owner = owner.toItem(),
     name = name,
     url = url,
-    description = description,
+    description = description.takeIf { it.isNotEmpty() },
     stars = stars
 )

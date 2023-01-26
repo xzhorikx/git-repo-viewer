@@ -8,7 +8,7 @@ import alex.zhurkov.git_repo_viewer.data.database.mapper.EntityMapper
 import alex.zhurkov.git_repo_viewer.domain.config.ConfigSource
 import alex.zhurkov.git_repo_viewer.domain.model.GitHubRepo
 import alex.zhurkov.git_repo_viewer.domain.model.GitHubReposPage
-import alex.zhurkov.git_repo_viewer.domain.model.RepoTimeframe
+import alex.zhurkov.git_repo_viewer.domain.model.RepoFilter
 import alex.zhurkov.git_repo_viewer.domain.model.asIsoDateFromNow
 
 class GitHubLocalSourceImpl(
@@ -20,26 +20,31 @@ class GitHubLocalSourceImpl(
         .save(page.repos.map(repoMapper::toEntity).map(GitHubRepoWithInfoEntity::gitHubRepoEntity))
 
     override suspend fun getPage(
-        page: Int, repoTimeframe: RepoTimeframe, limit: Int
-    ): GitHubReposPage.Timeframe? {
+        page: Int,
+        filter: RepoFilter.TimeFrame,
+        limit: Int
+    ): GitHubReposPage? {
         if (page <= 0) return null
         val offset = page * configSource.pageSize
         val repos = database.repoDao().get(
-            createdAtMin = repoTimeframe.asIsoDateFromNow(), limit = limit, offset = offset
+            createdAtMin = filter.asIsoDateFromNow(), limit = limit, offset = offset
         ).map(repoMapper::toModel).takeIf { it.isNotEmpty() } ?: return null
 
-        return GitHubReposPage.Timeframe(
-            pageId = page, isLastPage = repos.size < limit, timeframe = repoTimeframe, repos = repos
+        return GitHubReposPage(
+            pageId = page, isLastPage = repos.size < limit, repoFilter = filter, repos = repos
         )
     }
 
-    override suspend fun getFavorites(page: Int, limit: Int): GitHubReposPage.Favorite? {
+    override suspend fun getFavorites(page: Int, limit: Int): GitHubReposPage? {
         val offset = page * configSource.pageSize
         val repos = database.favoritesDao().get(limit = limit, offset = offset)
             .map(FavoriteRepoInfoEntity::repoEntity).map(repoMapper::toModel)
 
-        return GitHubReposPage.Favorite(
-            pageId = page, isLastPage = repos.size < limit, repos = repos
+        return GitHubReposPage(
+            pageId = page,
+            isLastPage = repos.size < limit,
+            repos = repos,
+            repoFilter = RepoFilter.Favorites
         )
     }
 

@@ -24,12 +24,12 @@ class MainActivityPresentationModule {
     @Provides
     @ActivityScope
     fun viewModelFactory(
-        GitHubReposUseCase: GitHubReposUseCase,
+        gitHubReposUseCase: GitHubReposUseCase,
         networkConnectionUseCase: NetworkConnectionUseCase,
         reducer: Reducer<MainActivityState, MainActivityChange>,
         stateToModelMapper: StateToModelMapper<MainActivityState, MainActivityModel>
     ) = MainActivityViewModelFactory(
-        GitHubReposUseCase = GitHubReposUseCase,
+        gitHubReposUseCase = gitHubReposUseCase,
         networkConnectionUseCase = networkConnectionUseCase,
         reducer = reducer,
         stateToModelMapper = stateToModelMapper

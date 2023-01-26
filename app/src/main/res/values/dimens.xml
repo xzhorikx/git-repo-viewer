@@ -4,6 +4,8 @@
     <dimen name="padding_4">4dp</dimen>
     <dimen name="padding_8">8dp</dimen>
     <dimen name="shimmer_height">92dp</dimen>
-    <dimen name="avatar_size">32dp</dimen>
+    <dimen name="avatar_size">64dp</dimen>
     <dimen name="corners_4">4dp</dimen>
+    <dimen name="icon_repo_detail_size">32dp</dimen>
+    <dimen name="divider_thickness">1dp</dimen>
 </resources>

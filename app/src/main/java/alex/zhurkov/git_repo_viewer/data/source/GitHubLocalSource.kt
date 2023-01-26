@@ -1,7 +1,7 @@
 package alex.zhurkov.git_repo_viewer.data.source
 
 import alex.zhurkov.git_repo_viewer.domain.model.GitHubReposPage
-import alex.zhurkov.git_repo_viewer.domain.model.RepoTimeframe
+import alex.zhurkov.git_repo_viewer.domain.model.RepoFilter
 
 interface GitHubLocalSource {
     suspend fun savePage(page: GitHubReposPage)
@@ -11,14 +11,14 @@ interface GitHubLocalSource {
      */
     suspend fun getPage(
         page: Int,
-        repoTimeframe: RepoTimeframe,
+        filter: RepoFilter.TimeFrame,
         limit: Int
-    ): GitHubReposPage.Timeframe?
+    ): GitHubReposPage?
 
     /**
      * Returns a page with saved favorite repositories
      */
-    suspend fun getFavorites(page: Int, limit: Int): GitHubReposPage.Favorite?
+    suspend fun getFavorites(page: Int, limit: Int): GitHubReposPage?
 
     suspend fun addFavorite(repoId: Long)
 

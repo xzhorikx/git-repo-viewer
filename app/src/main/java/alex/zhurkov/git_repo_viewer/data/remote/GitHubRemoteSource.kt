@@ -13,5 +13,5 @@ interface GitHubRemoteSource {
         @Query("per_page") limit: Int,
         @Query("sort") sort: String,
         @Header("Cache-Control") cacheControl: String
-    ): List<GitHubRepoResponse>
+    ): GitHubRepoResponse
 }

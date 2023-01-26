@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Repo Viewer</string>
     <string name="app_bar_title">Repositories</string>
-
+    <string name="stars">Stars</string>
+    <string name="error_message_template">Error: %1$s</string>
+    <string name="repo_no_description">This repository has no description</string>
 </resources>

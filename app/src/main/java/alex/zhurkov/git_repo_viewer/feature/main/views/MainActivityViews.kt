@@ -1,26 +1,28 @@
+@file:OptIn(ExperimentalTextApi::class)
+
 package alex.zhurkov.git_repo_viewer.feature.main.views
 
 import alex.zhurkov.git_repo_viewer.R
 import alex.zhurkov.git_repo_viewer.feature.main.model.GitHubRepoItem
 import alex.zhurkov.git_repo_viewer.feature.main.presentation.MainActivityModel
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.LocalOverscrollConfiguration
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -33,7 +35,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.LiveData
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
@@ -65,12 +75,14 @@ fun MainScreen(
                 LazyColumn(
                     modifier = modifier.testTag("item_container"),
                     state = state,
-                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_4)),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_8)),
                     contentPadding = PaddingValues(
                         vertical = dimensionResource(id = R.dimen.padding_8)
                     )
                 ) {
-                    items(items = renderModel.items, key = { it.id }) { item ->
+                    itemsIndexed(
+                        items = renderModel.items,
+                        key = { _, item -> item.id }) { index, item ->
                         val lastVisibleId by remember {
                             derivedStateOf {
                                 with(state.layoutInfo) {
@@ -95,6 +107,13 @@ fun MainScreen(
                                         .height(dimensionResource(id = R.dimen.shimmer_height))
                                 )
                             }
+                        }
+                        if (index < renderModel.items.lastIndex) {
+                            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_8)))
+                            Divider(
+                                color = MaterialTheme.colorScheme.outline,
+                                thickness = dimensionResource(id = R.dimen.divider_thickness)
+                            )
                         }
                     }
                 }
@@ -128,35 +147,58 @@ fun RepositoryPreview(
         imageLoader = imageLoader,
         error = ColorPainter(Color.Black),
     )
-    Row(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = modifier.fillMaxWidth()
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .clickable { onClick(item) },
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = "${item.owner.login}/${item.name}",
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 2,
-                style = MaterialTheme.typography.bodyMedium
+            Column(modifier = Modifier.weight(1f)) {
+                val title = buildAnnotatedString {
+                    append(item.owner.login)
+                    append("/")
+                    withStyle(
+                        style = SpanStyle(fontWeight = FontWeight.Bold)
+                    ) {
+                        append(item.name)
+                    }
+                }
+                Text(
+                    text = title,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 3,
+                    style = MaterialTheme.typography.titleMedium.copy(hyphens = Hyphens.Auto),
+                )
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_16)))
+                Text(
+                    text = item.description ?: stringResource(id = R.string.repo_no_description),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 3,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_16)))
+            Image(
+                modifier = Modifier
+                    .size(dimensionResource(id = R.dimen.avatar_size))
+                    .clip(RoundedCornerShape(dimensionResource(id = R.dimen.corners_4))),
+                painter = painter,
+                contentDescription = "Contributor avatar",
+                contentScale = ContentScale.Crop,
             )
-            Text(
-                text = item.description,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 3,
-                style = MaterialTheme.typography.bodySmall
+        } // End of repo title row
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_16)))
+        Row {
+            RepositoryDetail(
+                iconRes = R.drawable.ic_baseline_star_border_24,
+                title = item.stars.toString(),
+                body = stringResource(
+                    id = R.string.stars
+                )
             )
         }
-        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_16)))
-        Image(
-            modifier = Modifier
-                .size(dimensionResource(id = R.dimen.avatar_size))
-                .clip(RoundedCornerShape(dimensionResource(id = R.dimen.corners_4))),
-            painter = painter,
-            contentDescription = "Contributor avatar",
-            contentScale = ContentScale.Crop,
-        )
-
     }
 }
 
@@ -184,4 +226,36 @@ fun RepositoryLoading(
             .background(MaterialTheme.colorScheme.primaryContainer)
             .testTag(item.id)
     )
+}
+
+@Composable
+fun RepositoryDetail(
+    modifier: Modifier = Modifier,
+    @DrawableRes iconRes: Int,
+    title: String,
+    body: String
+) {
+    Row(modifier = modifier) {
+        Icon(
+            modifier = Modifier.size(dimensionResource(id = R.dimen.icon_repo_detail_size)),
+            painter = painterResource(id = iconRes),
+            contentDescription = body,
+        )
+        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_8)))
+        Column {
+            Text(
+                text = title,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_4)))
+            Text(
+                text = body,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+    }
 }
