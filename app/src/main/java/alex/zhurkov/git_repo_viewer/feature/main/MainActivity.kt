@@ -1,5 +1,7 @@
-package alex.zhurkov.git_repo_viewer
+package alex.zhurkov.git_repo_viewer.feature.main
 
+import alex.zhurkov.git_repo_viewer.feature.main.di.MainActivityComponent
+import alex.zhurkov.git_repo_viewer.ui.theme.GitrepoviewerTheme
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,9 +12,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import alex.zhurkov.git_repo_viewer.ui.theme.GitrepoviewerTheme
 
 class MainActivity : ComponentActivity() {
+
+    private val component: MainActivityComponent by lazy {
+        (application as MainActivityComponent.ComponentProvider).provideMainComponent(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
