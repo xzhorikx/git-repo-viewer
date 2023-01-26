@@ -6,6 +6,7 @@ data class GitHubRepoResponse(
     @SerializedName("id") val id: Long,
     @SerializedName("owner") val owner: OwnerResponse,
     @SerializedName("name") val name: String,
+    @SerializedName("avatar_url") val avatar: String,
     @SerializedName("html_url") val url: String,
     @SerializedName("description") val description: String?,
     @SerializedName("created_at") val createdAt: String,

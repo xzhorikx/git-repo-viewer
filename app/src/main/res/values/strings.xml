@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">git-repo-viewer</string>
+    <string name="app_name">Repo Viewer</string>
+    <string name="app_bar_title">Repositories</string>
+
 </resources>
