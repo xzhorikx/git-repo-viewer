@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -48,8 +48,8 @@ fun RepoInfoScreen(
                         navigationIcon = {
                             IconButton(onClick = { onBackClick() }) {
                                 Icon(
-                                    imageVector = Icons.Default.Settings,
-                                    contentDescription = "Filter settings"
+                                    imageVector = Icons.Default.ArrowBack,
+                                    contentDescription = "Back arrow"
                                 )
                             }
                         }
@@ -94,7 +94,7 @@ fun RepoInfoContent(
                 RepositoryPreview(
                     item,
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = {},
+                    onClick = { /* no need to handle */ },
                     onFavoriteClick = onFavoriteClick
                 )
                 RepositoryDetail(

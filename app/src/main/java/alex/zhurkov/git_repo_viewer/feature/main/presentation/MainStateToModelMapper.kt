@@ -26,6 +26,7 @@ class MainStateToModelMapper : StateToModelMapper<MainActivityState, MainActivit
     ): List<GitHubRepoItem> {
         val items = pages.flatMap { page ->
             page.repos.map { repo -> repo.toItem(isFavorite = repo.id in favorites) }
+                .sortedByDescending(GitHubRepoItem.Data::stars)
         }
         val loadingIndicators = when (isPageLoading) {
             true -> (0..7).map { GitHubRepoItem.Loading(id = "loading_$it") }
