@@ -56,12 +56,7 @@ class GitHubRepositoryImpl(
         repoFilter: RepoFilter.TimeFrame,
         skipCache: Boolean
     ): Flow<GitHubReposPage> = flow {
-        val localPage = when (skipCache) {
-            true -> null
-            false -> localSource.getPage(
-                page = pageId, filter = repoFilter, limit = limit
-            )
-        }
+        val localPage = localSource.getPage(page = pageId, filter = repoFilter, limit = limit)
 
         if (localPage != null) emit(localPage)
 
