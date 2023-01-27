@@ -40,14 +40,24 @@ class MainActivityViewModel(
         val isLastVisibleItemUpdated = oldState.lastVisibleItemId != newState.lastVisibleItemId
         val shouldLoadNextPage =
             isLastVisibleItemUpdated && newState.lastRepoId == newState.lastVisibleItemId
+        val isNetworkChanged =
+            oldState.isNetworkConnected != null && (oldState.isNetworkConnected != newState.isNetworkConnected)
 
         if (shouldLoadNextPage || isFilterChanged) {
             state.nextPage?.let { loadRepoPage(pageIndex = it, repoFilter = newState.repoFilter) }
         }
+        isNetworkChanged.whenTrue {
+            newState.isNetworkConnected?.let {
+                sendEvent(MainActivityEvent.NetworkConnectionChanged(it))
+            }
+        }
     }
 
-    override suspend fun provideChangesObservable(): Flow<MainActivityChange> =
-        gitHubReposUseCase.observeFavorites().map { MainActivityChange.FavoritesChanged(it) }
+    override suspend fun provideChangesObservable(): Flow<MainActivityChange> = merge(
+        gitHubReposUseCase.observeFavorites().map { MainActivityChange.FavoritesChanged(it) },
+        networkConnectionUseCase.observeConnectionState()
+            .map { MainActivityChange.NetworkChanged(isConnected = it) }
+    )
 
     override fun processAction(action: MainActivityAction) {
         when (action) {

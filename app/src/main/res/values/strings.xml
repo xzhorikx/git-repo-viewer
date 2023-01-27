@@ -15,4 +15,6 @@
     <string name="forks">Forks</string>
     <string name="created_at_template">Created: %1$s</string>
     <string name="language_template">Language: %1$s</string>
+    <string name="network_restored">Connection restored</string>
+    <string name="error_network_disconnected">No connection</string>
 </resources>

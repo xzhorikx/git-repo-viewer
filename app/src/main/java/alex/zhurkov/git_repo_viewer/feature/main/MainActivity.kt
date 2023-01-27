@@ -19,6 +19,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.*
@@ -70,6 +71,13 @@ class MainActivity : ComponentActivity() {
                         getString(R.string.error_message_template, event.e),
                         Toast.LENGTH_SHORT
                     ).show()
+                }
+                is MainActivityEvent.NetworkConnectionChanged -> {
+                    @StringRes val textRes = when (event.isConnected) {
+                        true -> R.string.network_restored
+                        false -> R.string.error_network_disconnected
+                    }
+                    Toast.makeText(this, getString(textRes), Toast.LENGTH_LONG).show()
                 }
             }
         }

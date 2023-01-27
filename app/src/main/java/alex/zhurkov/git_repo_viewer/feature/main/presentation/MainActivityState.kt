@@ -11,7 +11,8 @@ data class MainActivityState(
     val isRefreshing: Boolean,
     val repoFilter: RepoFilter,
     val lastVisibleItemId: Long?,
-    val favorites: List<Long>
+    val favorites: List<Long>,
+    val isNetworkConnected: Boolean?
 ) : UIState {
 
     companion object {
@@ -21,7 +22,8 @@ data class MainActivityState(
             repoFilter = RepoFilter.TimeFrame.LastDay,
             isRefreshing = false,
             lastVisibleItemId = null,
-            favorites = emptyList()
+            favorites = emptyList(),
+            isNetworkConnected = null
         )
     }
 
