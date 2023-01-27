@@ -10,6 +10,9 @@ import alex.zhurkov.git_repo_viewer.domain.model.RepoFilter
 import alex.zhurkov.git_repo_viewer.domain.model.asIsoDateFromNow
 import alex.zhurkov.git_repo_viewer.domain.repository.GitHubRepoRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 
 private const val SORT_STARS = "stars"
 
@@ -23,10 +26,12 @@ class GitHubRepositoryImpl(
         pageId: Int,
         repoFilter: RepoFilter,
         skipCache: Boolean
-    ): GitHubReposPage? {
+    ): Flow<GitHubReposPage> {
         val limit = configSource.pageSize
         return when (repoFilter) {
-            RepoFilter.Favorites -> getFavorites(pageId = pageId, limit = limit)
+            RepoFilter.Favorites -> {
+                getFavorites(pageId = pageId, limit = limit)?.run(::flowOf) ?: emptyFlow()
+            }
             is RepoFilter.TimeFrame -> {
                 getTimeframePage(
                     pageId = pageId,
@@ -50,7 +55,7 @@ class GitHubRepositoryImpl(
         limit: Int,
         repoFilter: RepoFilter.TimeFrame,
         skipCache: Boolean
-    ): GitHubReposPage {
+    ): Flow<GitHubReposPage> = flow {
         val localPage = when (skipCache) {
             true -> null
             false -> localSource.getPage(
@@ -58,7 +63,7 @@ class GitHubRepositoryImpl(
             )
         }
 
-        if (localPage != null && localPage.repos.size >= limit) return localPage
+        if (localPage != null) emit(localPage)
 
         val cacheControl = when (skipCache) {
             true -> "no-cache"
@@ -71,12 +76,13 @@ class GitHubRepositoryImpl(
             page = pageId,
             cacheControl = cacheControl
         ).items
-        return GitHubReposPage(
+        val remotePage = GitHubReposPage(
             pageId = pageId,
             isLastPage = response.isEmpty(),
             repos = response.map(repoRemoteMapper::map),
             repoFilter = repoFilter
         ).also { localSource.savePage(it) }
+        emit(remotePage)
     }
 
     private suspend fun getFavorites(pageId: Int, limit: Int): GitHubReposPage? =

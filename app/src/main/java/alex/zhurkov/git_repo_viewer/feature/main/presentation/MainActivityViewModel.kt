@@ -11,8 +11,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.CancellationException
@@ -102,29 +101,27 @@ class MainActivityViewModel(
             }
         }
         pageJob = viewModelScope.launch(dispatcher) {
-            execute(
-                action = {
-                    gitHubReposUseCase.getRepoPage(
-                        pageId = pageIndex,
-                        repoFilter = repoFilter,
-                        skipCache = forceRefresh
-                    )
-                },
-                onStart = {
+            gitHubReposUseCase.getRepoPage(
+                pageId = pageIndex,
+                repoFilter = repoFilter,
+                skipCache = forceRefresh
+            )
+                .distinctUntilChanged()
+                .catch { e -> onPageLoadingError(e) }
+                .onStart {
                     sendChange(MainActivityChange.PageLoadingChanged(isLoading = true))
                     forceRefresh.whenTrue {
                         sendChange(MainActivityChange.RefreshChanged(isRefreshing = true))
                     }
-                },
-                onComplete = {
+                }
+                .onCompletion {
                     sendChange(MainActivityChange.PageLoadingChanged(isLoading = false))
                     forceRefresh.whenTrue {
                         sendChange(MainActivityChange.RefreshChanged(isRefreshing = false))
                     }
-                },
-                onErrorOccurred = { onPageLoadingError(it) },
-                onSuccess = { sendChange(MainActivityChange.PageLoaded(it)) }
-            )
+                }
+                .onEach { sendChange(MainActivityChange.PageLoaded(it)) }
+                .launchIn(this)
         }
     }
 

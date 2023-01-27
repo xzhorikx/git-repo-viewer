@@ -10,7 +10,7 @@ interface GitHubRepoRepository {
         pageId: Int,
         repoFilter: RepoFilter,
         skipCache: Boolean
-    ): GitHubReposPage?
+    ): Flow<GitHubReposPage>
 
     /**
      * Returns flow of all saved favorite IDs

@@ -14,7 +14,7 @@ class GitHubReposUseCaseImpl(
         pageId: Int,
         repoFilter: RepoFilter,
         skipCache: Boolean
-    ): GitHubReposPage? = gitHubRepository.getRepoPage(
+    ): Flow<GitHubReposPage> = gitHubRepository.getRepoPage(
         pageId = pageId,
         repoFilter = repoFilter,
         skipCache = skipCache
