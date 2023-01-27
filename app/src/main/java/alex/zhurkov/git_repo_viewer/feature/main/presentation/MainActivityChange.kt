@@ -11,4 +11,5 @@ sealed class MainActivityChange : UIStateChange {
     data class RefreshChanged(val isRefreshing: Boolean) : MainActivityChange()
     data class PageLoaded(val data: GitHubReposPage?) : MainActivityChange()
     data class FilterChanged(val data: RepoFilter) : MainActivityChange()
+    data class LastVisibleItemChanged(val id: Long) : MainActivityChange()
 }

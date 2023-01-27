@@ -38,7 +38,11 @@ class MainActivityViewModel(
     override fun onStateUpdated(oldState: MainActivityState, newState: MainActivityState) {
         super.onStateUpdated(oldState, newState)
         val isFilterChanged = oldState.repoFilter != newState.repoFilter
-        isFilterChanged.whenTrue {
+        val isLastVisibleItemUpdated = oldState.lastVisibleItemId != newState.lastVisibleItemId
+        val shouldLoadNextPage =
+            isLastVisibleItemUpdated && newState.lastRepoId == newState.lastVisibleItemId
+
+        if (shouldLoadNextPage || isFilterChanged) {
             state.nextPage?.let { loadRepoPage(pageIndex = it, repoFilter = newState.repoFilter) }
         }
     }
@@ -51,6 +55,12 @@ class MainActivityViewModel(
                 sendChange(MainActivityChange.FilterChanged(action.data))
             }
             MainActivityAction.Refresh -> refreshRepos()
+            is MainActivityAction.LastVisibleItemChanged -> {
+                if (action.id != state.lastVisibleItemId) {
+                    sendChange(MainActivityChange.LastVisibleItemChanged(action.id))
+                }
+                Unit
+            }
         }
     }
 

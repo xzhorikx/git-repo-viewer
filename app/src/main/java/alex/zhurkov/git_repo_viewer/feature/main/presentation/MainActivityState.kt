@@ -9,7 +9,8 @@ data class MainActivityState(
     val pages: List<GitHubReposPage>,
     val isPageLoading: Boolean,
     val isRefreshing: Boolean,
-    val repoFilter: RepoFilter
+    val repoFilter: RepoFilter,
+    val lastVisibleItemId: Long?
 ) : UIState {
 
     companion object {
@@ -17,7 +18,8 @@ data class MainActivityState(
             pages = emptyList(),
             isPageLoading = false,
             repoFilter = RepoFilter.TimeFrame.LastDay,
-            isRefreshing = false
+            isRefreshing = false,
+            lastVisibleItemId = null
         )
     }
 
@@ -29,5 +31,7 @@ data class MainActivityState(
 
     val nextPage =
         isLastPageLoaded.whenFalse { (pages.lastOrNull()?.pageId?.inc() ?: initialPageId) }
+
+    val lastRepoId = pages.flatMap { it.repos }.lastOrNull()?.id
 
 }

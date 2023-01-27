@@ -41,7 +41,9 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxSize(),
                 uiModel = viewModel.observableModel,
                 onPullToRefresh = { viewModel.dispatch(MainActivityAction.Refresh) },
-                onLastItemVisible = {},
+                onLastItemVisible = {
+                    viewModel.dispatch(MainActivityAction.LastVisibleItemChanged(id = it))
+                },
                 onClick = {},
                 onFilterSelected = { viewModel.dispatch(MainActivityAction.FilterSelected(it)) }
             )

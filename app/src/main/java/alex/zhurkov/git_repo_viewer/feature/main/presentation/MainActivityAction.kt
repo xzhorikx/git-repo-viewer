@@ -6,4 +6,5 @@ import alex.zhurkov.git_repo_viewer.domain.model.RepoFilter
 sealed class MainActivityAction : UIAction {
     object Refresh : MainActivityAction()
     data class FilterSelected(val data: RepoFilter) : MainActivityAction()
+    data class LastVisibleItemChanged(val id: Long) : MainActivityAction()
 }

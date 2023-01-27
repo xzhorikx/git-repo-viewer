@@ -65,7 +65,7 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     uiModel: LiveData<MainActivityModel>,
     onPullToRefresh: () -> Unit,
-    onLastItemVisible: (id: String) -> Unit,
+    onLastItemVisible: (id: Long) -> Unit,
     onClick: (GitHubRepoItem.Data) -> Unit,
     onFilterSelected: (RepoFilter) -> Unit
 ) {
@@ -153,7 +153,7 @@ fun MainContent(
     modifier: Modifier = Modifier,
     renderModel: MainActivityModel,
     onPullToRefresh: () -> Unit,
-    onLastItemVisible: (id: String) -> Unit,
+    onLastItemVisible: (id: Long) -> Unit,
     onClick: (GitHubRepoItem.Data) -> Unit
 ) {
     val pullToRefreshState =
@@ -177,7 +177,9 @@ fun MainContent(
                     val lastVisibleId by remember {
                         derivedStateOf {
                             with(state.layoutInfo) {
-                                (visibleItemsInfo.lastOrNull()?.key as? String).takeIf { it == (item as? GitHubRepoItem.Data)?.id }
+                                (visibleItemsInfo.lastOrNull()?.key as? String)
+                                    .takeIf { it == (item as? GitHubRepoItem.Data)?.id }
+                                    ?.toLong()
                             }
                         }
                     }
