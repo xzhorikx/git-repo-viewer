@@ -6,6 +6,7 @@ import alex.zhurkov.git_repo_viewer.R
 import alex.zhurkov.git_repo_viewer.domain.model.RepoFilter
 import alex.zhurkov.git_repo_viewer.feature.main.model.GitHubRepoItem
 import alex.zhurkov.git_repo_viewer.feature.main.presentation.MainActivityModel
+import alex.zhurkov.git_repo_viewer.ui.theme.GitRepoViewerTheme
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -96,53 +97,55 @@ fun MainScreen(
                     }
                 )
             }) {
-            Scaffold(
-                modifier = modifier.fillMaxSize(),
-                topBar = {
-                    TopAppBar(
-                        title = {
-                            Text(
-                                stringResource(
-                                    id = R.string.app_bar_title_template,
-                                    stringResource(id = renderModel.selectedFilter.mapStringRes())
+            GitRepoViewerTheme {
+                Scaffold(
+                    modifier = modifier.fillMaxSize(),
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    stringResource(
+                                        id = R.string.app_bar_title_template,
+                                        stringResource(id = renderModel.selectedFilter.mapStringRes())
+                                    )
                                 )
-                            )
-                        },
-                        scrollBehavior = scrollBehavior,
-                        actions = {
-                            IconButton(onClick = {
-                                coroutineScope.launch {
-                                    modalSheetState.animateTo(
-                                        ModalBottomSheetValue.Expanded
+                            },
+                            scrollBehavior = scrollBehavior,
+                            actions = {
+                                IconButton(onClick = {
+                                    coroutineScope.launch {
+                                        modalSheetState.animateTo(
+                                            ModalBottomSheetValue.Expanded
+                                        )
+                                    }
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Settings,
+                                        contentDescription = "Filter settings"
                                     )
                                 }
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.Settings,
-                                    contentDescription = "Filter settings"
-                                )
                             }
-                        }
+                        )
+                    }
+                ) { paddingValues ->
+                    MainContent(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(
+                                PaddingValues(
+                                    start = dimensionResource(id = R.dimen.padding_16),
+                                    end = dimensionResource(id = R.dimen.padding_16),
+                                    top = paddingValues.calculateTopPadding(),
+                                    bottom = paddingValues.calculateBottomPadding()
+                                )
+                            ),
+                        renderModel = renderModel,
+                        onPullToRefresh = onPullToRefresh,
+                        onLastItemVisible = onLastItemVisible,
+                        onClick = onClick,
+                        onFavoriteClick = onFavoriteClick
                     )
                 }
-            ) { paddingValues ->
-                MainContent(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(
-                            PaddingValues(
-                                start = dimensionResource(id = R.dimen.padding_16),
-                                end = dimensionResource(id = R.dimen.padding_16),
-                                top = paddingValues.calculateTopPadding(),
-                                bottom = paddingValues.calculateBottomPadding()
-                            )
-                        ),
-                    renderModel = renderModel,
-                    onPullToRefresh = onPullToRefresh,
-                    onLastItemVisible = onLastItemVisible,
-                    onClick = onClick,
-                    onFavoriteClick = onFavoriteClick
-                )
             }
         }
 
@@ -346,7 +349,7 @@ fun RepositoryDetail(
     modifier: Modifier = Modifier,
     @DrawableRes iconRes: Int,
     title: String,
-    body: String
+    body: String?
 ) {
     Row(modifier = modifier) {
         Icon(
@@ -362,13 +365,15 @@ fun RepositoryDetail(
                 maxLines = 1,
                 style = MaterialTheme.typography.titleSmall
             )
-            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_4)))
-            Text(
-                text = body,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1,
-                style = MaterialTheme.typography.bodySmall
-            )
+            if (body != null) {
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_4)))
+                Text(
+                    text = body,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }

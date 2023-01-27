@@ -19,6 +19,8 @@ class GitHubRepoResponseMapper : Mapper<GitHubPageResponse, GitHubRepo> {
         createdAt = from.createdAt,
         updatedAt = from.updatedAt,
         description = from.description.orEmpty(),
-        stars = from.stars
+        stars = from.stars,
+        forks = from.forks,
+        language = from.language.orEmpty()
     )
 }

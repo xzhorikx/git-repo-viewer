@@ -18,7 +18,9 @@ class GitHubRepoEntityMapper(
             description = entity.gitHubRepoEntity.description,
             createdAt = entity.gitHubRepoEntity.createdAt,
             updatedAt = entity.gitHubRepoEntity.updatedAt,
-            stars = entity.gitHubRepoEntity.stars
+            stars = entity.gitHubRepoEntity.stars,
+            forks = entity.gitHubRepoEntity.forks,
+            language = entity.gitHubRepoEntity.language
         )
     }
 
@@ -33,7 +35,9 @@ class GitHubRepoEntityMapper(
                 description = model.description,
                 createdAt = model.createdAt,
                 updatedAt = model.updatedAt,
-                stars = model.stars
+                stars = model.stars,
+                forks = model.forks,
+                language = model.language
             )
         )
     }

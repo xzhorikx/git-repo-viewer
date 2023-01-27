@@ -1,5 +1,6 @@
 package alex.zhurkov.git_repo_viewer.data.source
 
+import alex.zhurkov.git_repo_viewer.domain.model.GitHubRepo
 import alex.zhurkov.git_repo_viewer.domain.model.GitHubReposPage
 import alex.zhurkov.git_repo_viewer.domain.model.RepoFilter
 import kotlinx.coroutines.flow.Flow
@@ -28,4 +29,6 @@ interface GitHubLocalSource {
     suspend fun addFavorite(repoId: Long)
 
     suspend fun removeFavorite(repoId: Long)
+
+    fun observeById(repoId: Long): Flow<GitHubRepo>
 }

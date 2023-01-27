@@ -2,6 +2,7 @@
     <string name="app_name">Repo Viewer</string>
     <string name="app_bar_title_template">Most starred %1$s</string>
     <string name="stars">Stars</string>
+    <string name="loading_repo">Repository is loading</string>
     <string name="error_message_template">Error: %1$s</string>
     <string name="repo_no_description">This repository has no description</string>
     <string name="filter_favorites">Favorites</string>
@@ -9,4 +10,9 @@
     <string name="filter_last_month">Last month</string>
     <string name="filter_last_week">Last week</string>
     <string name="title_filter_selection">Repository filters</string>
+    <string name="repo_info_title">Repository</string>
+    <string name="error_language_null">Language not specified</string>
+    <string name="forks">Forks</string>
+    <string name="created_at_template">Created: %1$s</string>
+    <string name="language_template">Language: %1$s</string>
 </resources>

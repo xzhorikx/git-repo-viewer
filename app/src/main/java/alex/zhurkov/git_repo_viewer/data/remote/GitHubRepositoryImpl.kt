@@ -43,6 +43,8 @@ class GitHubRepositoryImpl(
         }
     }
 
+    override fun observeById(repoId: Long): Flow<GitHubRepo> = localSource.observeById(repoId)
+
     override fun observeFavorites(): Flow<List<Long>> = localSource.observeFavorites()
 
     override suspend fun saveFavorite(id: Long, isFavorite: Boolean) = when (isFavorite) {

@@ -14,5 +14,7 @@ data class GitHubPageResponse(
     @SerializedName("description") val description: String?,
     @SerializedName("created_at") val createdAt: String,
     @SerializedName("updated_at") val updatedAt: String,
-    @SerializedName("stargazers_count") val stars: Int
+    @SerializedName("stargazers_count") val stars: Int,
+    @SerializedName("forks") val forks: Int,
+    @SerializedName("language") val language: String?
 )

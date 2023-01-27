@@ -5,6 +5,7 @@ import alex.zhurkov.git_repo_viewer.data.database.entity.GitHubRepoWithInfoEntit
 import alex.zhurkov.git_repo_viewer.data.database.entity.RepoFilterRelationEntity
 import alex.zhurkov.git_repo_viewer.domain.model.RepoFilter
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface GitHubRepoDao {
@@ -29,5 +30,9 @@ interface GitHubRepoDao {
         limit: Int,
         offset: Int
     ): List<GitHubRepoWithInfoEntity>
+
+
+    @Query("SELECT * FROM git_hub_repo where repoId = :id")
+    fun observeById(id: Long): Flow<GitHubRepoWithInfoEntity>
 
 }

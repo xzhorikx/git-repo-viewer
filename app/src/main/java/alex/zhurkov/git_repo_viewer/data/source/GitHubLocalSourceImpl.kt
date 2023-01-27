@@ -69,4 +69,7 @@ class GitHubLocalSourceImpl(
 
     override suspend fun removeFavorite(repoId: Long) =
         database.favoritesDao().delete(FavoriteRepoEntity(favRepoId = repoId))
+
+    override fun observeById(repoId: Long): Flow<GitHubRepo> =
+        database.repoDao().observeById(repoId).map(repoMapper::toModel)
 }

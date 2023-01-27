@@ -1,5 +1,6 @@
 package alex.zhurkov.git_repo_viewer.data.usecase
 
+import alex.zhurkov.git_repo_viewer.domain.model.GitHubRepo
 import alex.zhurkov.git_repo_viewer.domain.model.GitHubReposPage
 import alex.zhurkov.git_repo_viewer.domain.model.RepoFilter
 import alex.zhurkov.git_repo_viewer.domain.repository.GitHubRepoRepository
@@ -27,4 +28,6 @@ class GitHubReposUseCaseImpl(
             id = id,
             isFavorite = isFavorite
         )
+
+    override fun observeById(repoId: Long): Flow<GitHubRepo> = gitHubRepository.observeById(repoId)
 }

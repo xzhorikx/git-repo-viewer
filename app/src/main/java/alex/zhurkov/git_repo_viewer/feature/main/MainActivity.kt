@@ -10,6 +10,10 @@ import alex.zhurkov.git_repo_viewer.feature.main.presentation.MainActivityEvent
 import alex.zhurkov.git_repo_viewer.feature.main.presentation.MainActivityViewModel
 import alex.zhurkov.git_repo_viewer.feature.main.presentation.MainActivityViewModelFactory
 import alex.zhurkov.git_repo_viewer.feature.main.views.MainScreen
+import alex.zhurkov.git_repo_viewer.feature.repoinfo.RepoInfoActivity
+import alex.zhurkov.git_repo_viewer.feature.repoinfo.model.RepoInfoInputData
+import alex.zhurkov.git_repo_viewer.feature.repoinfo.model.toBundle
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -44,9 +48,15 @@ class MainActivity : ComponentActivity() {
                 onLastItemVisible = {
                     viewModel.dispatch(MainActivityAction.LastVisibleItemChanged(id = it))
                 },
-                onClick = {},
+                onClick = {
+                    this@MainActivity.startActivity(
+                        Intent(this@MainActivity, RepoInfoActivity::class.java).putExtras(
+                            RepoInfoInputData(repoId = it.id.toLong()).toBundle()
+                        )
+                    )
+                },
                 onFilterSelected = { viewModel.dispatch(MainActivityAction.FilterSelected(it)) },
-                onFavoriteClick =  { viewModel.dispatch(MainActivityAction.FavoriteClicked(it)) },
+                onFavoriteClick = { viewModel.dispatch(MainActivityAction.FavoriteClicked(it)) },
             )
         }
     }

@@ -9,4 +9,6 @@ data class GitHubRepo(
     val createdAt: String,
     val updatedAt: String,
     val stars: Int,
+    val forks: Int,
+    val language: String
 )
