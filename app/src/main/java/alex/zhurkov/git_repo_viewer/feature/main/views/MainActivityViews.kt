@@ -301,9 +301,11 @@ fun RepositoryPreview(
                     id = R.string.stars
                 )
             )
-            IconButton(onClick = { onFavoriteClick(item) }) {
+            IconButton(
+                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_favorite_size)),
+                onClick = { onFavoriteClick(item) }
+            ) {
                 Icon(
-                    modifier = Modifier.size(dimensionResource(id = R.dimen.icon_repo_detail_size)),
                     painter = painterResource(id = iconFavoriteRes),
                     contentDescription = "$modifier",
                     tint = colorResource(id = R.color.favorite)

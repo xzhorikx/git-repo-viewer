@@ -8,6 +8,7 @@
     <dimen name="corners_4">4dp</dimen>
     <dimen name="corners_12">12dp</dimen>
     <dimen name="icon_repo_detail_size">32dp</dimen>
+    <dimen name="icon_favorite_size">32dp</dimen>
     <dimen name="icon_filter_size">24dp</dimen>
     <dimen name="divider_thickness">1dp</dimen>
 </resources>

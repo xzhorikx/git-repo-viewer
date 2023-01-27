@@ -11,7 +11,7 @@ import androidx.room.PrimaryKey
             entity = GitHubRepoEntity::class,
             parentColumns = ["repoId"],
             childColumns = ["favRepoId"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.NO_ACTION
         ),
     ]
 )
