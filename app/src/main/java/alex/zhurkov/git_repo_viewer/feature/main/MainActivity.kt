@@ -40,10 +40,10 @@ class MainActivity : ComponentActivity() {
             MainScreen(
                 modifier = Modifier.fillMaxSize(),
                 uiModel = viewModel.observableModel,
-                onPullToRefresh = {},
+                onPullToRefresh = { viewModel.dispatch(MainActivityAction.Refresh) },
                 onLastItemVisible = {},
                 onClick = {},
-                onFilterSelected = {viewModel.dispatch(MainActivityAction.FilterSelected(it))}
+                onFilterSelected = { viewModel.dispatch(MainActivityAction.FilterSelected(it)) }
             )
         }
     }

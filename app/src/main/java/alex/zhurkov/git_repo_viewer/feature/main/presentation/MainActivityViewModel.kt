@@ -50,7 +50,17 @@ class MainActivityViewModel(
             is MainActivityAction.FilterSelected -> {
                 sendChange(MainActivityChange.FilterChanged(action.data))
             }
+            MainActivityAction.Refresh -> refreshRepos()
         }
+    }
+
+    private fun refreshRepos() {
+        sendChange(MainActivityChange.ItemsCleared)
+        loadRepoPage(
+            pageIndex = state.initialPageId,
+            repoFilter = state.repoFilter,
+            forceRefresh = true
+        )
     }
 
     private fun loadRepoPage(

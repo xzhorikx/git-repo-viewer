@@ -24,6 +24,7 @@ class MainActivityReducer : Reducer<MainActivityState, MainActivityChange> {
             is MainActivityChange.FilterChanged -> {
                 state.copy(repoFilter = change.data, pages = emptyList())
             }
+            MainActivityChange.ItemsCleared -> state.copy(pages = emptyList())
         }
     }
 }
