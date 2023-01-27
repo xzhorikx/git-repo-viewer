@@ -50,7 +50,7 @@ class GitHubRepositoryImpl(
             )
         }
 
-        if (localPage != null) return localPage
+        if (localPage != null && localPage.repos.size >= limit) return localPage
 
         val cacheControl = when (skipCache) {
             true -> "no-cache"

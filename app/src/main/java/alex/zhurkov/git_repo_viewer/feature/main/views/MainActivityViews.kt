@@ -3,6 +3,7 @@
 package alex.zhurkov.git_repo_viewer.feature.main.views
 
 import alex.zhurkov.git_repo_viewer.R
+import alex.zhurkov.git_repo_viewer.domain.model.RepoFilter
 import alex.zhurkov.git_repo_viewer.feature.main.model.GitHubRepoItem
 import alex.zhurkov.git_repo_viewer.feature.main.presentation.MainActivityModel
 import androidx.annotation.DrawableRes
@@ -16,12 +17,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.material.Divider
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -52,77 +56,163 @@ import com.valentinilk.shimmer.LocalShimmerTheme
 import com.valentinilk.shimmer.ShimmerBounds
 import com.valentinilk.shimmer.rememberShimmer
 import com.valentinilk.shimmer.shimmer
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
-@ExperimentalMaterialApi
+
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
     uiModel: LiveData<MainActivityModel>,
     onPullToRefresh: () -> Unit,
     onLastItemVisible: (id: String) -> Unit,
-    onClick: (GitHubRepoItem.Data) -> Unit
+    onClick: (GitHubRepoItem.Data) -> Unit,
+    onFilterSelected: (RepoFilter) -> Unit
 ) {
     val model by uiModel.observeAsState()
+    val scrollBehavior =
+        TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val coroutineScope = rememberCoroutineScope()
+    val modalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded },
+        skipHalfExpanded = true
+    )
     model?.let { renderModel ->
-        val pullToRefreshState =
-            rememberPullRefreshState(renderModel.isRefreshing, onPullToRefresh)
-        val state = rememberLazyListState()
-        CompositionLocalProvider(
-            LocalOverscrollConfiguration provides null
-        ) {
-            Box(Modifier.pullRefresh(pullToRefreshState)) {
-                LazyColumn(
-                    modifier = modifier.testTag("item_container"),
-                    state = state,
-                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_8)),
-                    contentPadding = PaddingValues(
-                        vertical = dimensionResource(id = R.dimen.padding_8)
-                    )
-                ) {
-                    itemsIndexed(
-                        items = renderModel.items,
-                        key = { _, item -> item.id }) { index, item ->
-                        val lastVisibleId by remember {
-                            derivedStateOf {
-                                with(state.layoutInfo) {
-                                    (visibleItemsInfo.lastOrNull()?.key as? String).takeIf { it == (item as? GitHubRepoItem.Data)?.id }
+        ModalBottomSheetLayout(
+            sheetState = modalSheetState,
+            sheetShape = RoundedCornerShape(
+                topStart = dimensionResource(id = R.dimen.corners_12),
+                topEnd = dimensionResource(id = R.dimen.corners_12)
+            ),
+            sheetContent = {
+                RepoFilterDialog(
+                    selectedFilter = renderModel.selectedFilter,
+                    onFilterClick = {
+                        coroutineScope.launch { modalSheetState.hide() }
+                        onFilterSelected(it)
+                    }
+                )
+            }) {
+            Scaffold(
+                modifier = modifier.fillMaxSize(),
+                topBar = {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                stringResource(
+                                    id = R.string.app_bar_title_template,
+                                    stringResource(id = renderModel.selectedFilter.mapStringRes())
+                                )
+                            )
+                        },
+                        scrollBehavior = scrollBehavior,
+                        actions = {
+                            IconButton(onClick = {
+                                coroutineScope.launch {
+                                    modalSheetState.animateTo(
+                                        ModalBottomSheetValue.Expanded
+                                    )
                                 }
-                            }
-                        }
-                        lastVisibleId?.run(onLastItemVisible)
-                        when (item) {
-                            is GitHubRepoItem.Data -> {
-                                RepositoryPreview(
-                                    item,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    onClick = onClick
-                                )
-                            }
-                            is GitHubRepoItem.Loading -> {
-                                RepositoryLoading(
-                                    item = item,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(dimensionResource(id = R.dimen.shimmer_height))
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Settings,
+                                    contentDescription = "Filter settings"
                                 )
                             }
                         }
-                        if (index < renderModel.items.lastIndex) {
-                            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_8)))
-                            Divider(
-                                color = MaterialTheme.colorScheme.outline,
-                                thickness = dimensionResource(id = R.dimen.divider_thickness)
+                    )
+                }
+            ) { paddingValues ->
+                MainContent(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(
+                            PaddingValues(
+                                start = dimensionResource(id = R.dimen.padding_16),
+                                end = dimensionResource(id = R.dimen.padding_16),
+                                top = paddingValues.calculateTopPadding(),
+                                bottom = paddingValues.calculateBottomPadding()
+                            )
+                        ),
+                    renderModel = renderModel,
+                    onPullToRefresh = onPullToRefresh,
+                    onLastItemVisible = onLastItemVisible,
+                    onClick = onClick
+                )
+            }
+        }
+
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@ExperimentalMaterialApi
+@Composable
+fun MainContent(
+    modifier: Modifier = Modifier,
+    renderModel: MainActivityModel,
+    onPullToRefresh: () -> Unit,
+    onLastItemVisible: (id: String) -> Unit,
+    onClick: (GitHubRepoItem.Data) -> Unit
+) {
+    val pullToRefreshState =
+        rememberPullRefreshState(renderModel.isRefreshing, onPullToRefresh)
+    val state = rememberLazyListState()
+    CompositionLocalProvider(
+        LocalOverscrollConfiguration provides null
+    ) {
+        Box(Modifier.pullRefresh(pullToRefreshState)) {
+            LazyColumn(
+                modifier = modifier.testTag("item_container"),
+                state = state,
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_8)),
+                contentPadding = PaddingValues(
+                    vertical = dimensionResource(id = R.dimen.padding_8)
+                )
+            ) {
+                itemsIndexed(
+                    items = renderModel.items,
+                    key = { _, item -> item.id }) { index, item ->
+                    val lastVisibleId by remember {
+                        derivedStateOf {
+                            with(state.layoutInfo) {
+                                (visibleItemsInfo.lastOrNull()?.key as? String).takeIf { it == (item as? GitHubRepoItem.Data)?.id }
+                            }
+                        }
+                    }
+                    lastVisibleId?.run(onLastItemVisible)
+                    when (item) {
+                        is GitHubRepoItem.Data -> {
+                            RepositoryPreview(
+                                item,
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = onClick
+                            )
+                        }
+                        is GitHubRepoItem.Loading -> {
+                            RepositoryLoading(
+                                item = item,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(dimensionResource(id = R.dimen.shimmer_height))
                             )
                         }
                     }
+                    if (index < renderModel.items.lastIndex) {
+                        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_8)))
+                        Divider(
+                            color = MaterialTheme.colorScheme.outline,
+                            thickness = dimensionResource(id = R.dimen.divider_thickness)
+                        )
+                    }
                 }
-                PullRefreshIndicator(
-                    modifier = Modifier.align(Alignment.TopCenter),
-                    refreshing = renderModel.isRefreshing,
-                    state = pullToRefreshState,
-                )
             }
+            PullRefreshIndicator(
+                modifier = Modifier.align(Alignment.TopCenter),
+                refreshing = renderModel.isRefreshing,
+                state = pullToRefreshState,
+            )
         }
     }
 }
@@ -247,7 +337,7 @@ fun RepositoryDetail(
                 text = title,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.titleSmall
             )
             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_4)))
             Text(
@@ -258,4 +348,11 @@ fun RepositoryDetail(
             )
         }
     }
+}
+
+fun RepoFilter.mapStringRes(): Int = when (this) {
+    RepoFilter.Favorites -> R.string.filter_favorites
+    RepoFilter.TimeFrame.LastDay -> R.string.filter_last_day
+    RepoFilter.TimeFrame.LastMonth -> R.string.filter_last_month
+    RepoFilter.TimeFrame.LastWeek -> R.string.filter_last_week
 }

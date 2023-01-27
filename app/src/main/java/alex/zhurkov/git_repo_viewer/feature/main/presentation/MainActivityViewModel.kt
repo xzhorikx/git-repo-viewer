@@ -31,15 +31,27 @@ class MainActivityViewModel(
     override fun onObserverActive(isFirstTime: Boolean) {
         super.onObserverActive(isFirstTime)
         if (isFirstTime) {
-            state.nextPage?.let {
-                loadRepoPage(pageIndex = it, repoFilter = state.repoFilter)
-            }
+            state.nextPage?.let { loadRepoPage(pageIndex = it, repoFilter = state.repoFilter) }
+        }
+    }
+
+    override fun onStateUpdated(oldState: MainActivityState, newState: MainActivityState) {
+        super.onStateUpdated(oldState, newState)
+        val isFilterChanged = oldState.repoFilter != newState.repoFilter
+        isFilterChanged.whenTrue {
+            state.nextPage?.let { loadRepoPage(pageIndex = it, repoFilter = newState.repoFilter) }
         }
     }
 
     override suspend fun provideChangesObservable(): Flow<MainActivityChange> = emptyFlow()
 
-    override fun processAction(action: MainActivityAction) = Unit
+    override fun processAction(action: MainActivityAction) {
+        when (action) {
+            is MainActivityAction.FilterSelected -> {
+                sendChange(MainActivityChange.FilterChanged(action.data))
+            }
+        }
+    }
 
     private fun loadRepoPage(
         pageIndex: Int,

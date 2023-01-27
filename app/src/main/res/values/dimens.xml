@@ -3,9 +3,11 @@
     <dimen name="padding_16">16dp</dimen>
     <dimen name="padding_4">4dp</dimen>
     <dimen name="padding_8">8dp</dimen>
-    <dimen name="shimmer_height">92dp</dimen>
+    <dimen name="shimmer_height">160dp</dimen>
     <dimen name="avatar_size">64dp</dimen>
     <dimen name="corners_4">4dp</dimen>
+    <dimen name="corners_12">12dp</dimen>
     <dimen name="icon_repo_detail_size">32dp</dimen>
+    <dimen name="icon_filter_size">24dp</dimen>
     <dimen name="divider_thickness">1dp</dimen>
 </resources>

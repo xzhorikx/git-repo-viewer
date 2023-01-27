@@ -21,6 +21,9 @@ class MainActivityReducer : Reducer<MainActivityState, MainActivityChange> {
             }
             is MainActivityChange.PageLoadingChanged -> state.copy(isPageLoading = change.isLoading)
             is MainActivityChange.RefreshChanged -> state.copy(isRefreshing = change.isRefreshing)
+            is MainActivityChange.FilterChanged -> {
+                state.copy(repoFilter = change.data, pages = emptyList())
+            }
         }
     }
 }

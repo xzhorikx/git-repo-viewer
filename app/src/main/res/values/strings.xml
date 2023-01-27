@@ -1,7 +1,12 @@
 <resources>
     <string name="app_name">Repo Viewer</string>
-    <string name="app_bar_title">Repositories</string>
+    <string name="app_bar_title_template">Most starred %1$s</string>
     <string name="stars">Stars</string>
     <string name="error_message_template">Error: %1$s</string>
     <string name="repo_no_description">This repository has no description</string>
+    <string name="filter_favorites">Favorites</string>
+    <string name="filter_last_day">Last day</string>
+    <string name="filter_last_month">Last month</string>
+    <string name="filter_last_week">Last week</string>
+    <string name="title_filter_selection">Repository filters</string>
 </resources>

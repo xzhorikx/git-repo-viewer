@@ -16,8 +16,13 @@ class GitHubLocalSourceImpl(
     private val repoMapper: EntityMapper<GitHubRepo, GitHubRepoWithInfoEntity>,
     private val configSource: ConfigSource
 ) : GitHubLocalSource {
-    override suspend fun savePage(page: GitHubReposPage) = database.repoDao()
-        .save(page.repos.map(repoMapper::toEntity).map(GitHubRepoWithInfoEntity::gitHubRepoEntity))
+    override suspend fun savePage(page: GitHubReposPage) {
+        page.repos.forEach {
+            val entity = repoMapper.toEntity(it)
+            database.ownerDao().save(entity.owner)
+            database.repoDao().save(entity.gitHubRepoEntity)
+        }
+    }
 
     override suspend fun getPage(
         page: Int,

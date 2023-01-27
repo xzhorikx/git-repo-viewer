@@ -10,7 +10,8 @@ class MainStateToModelMapper : StateToModelMapper<MainActivityState, MainActivit
         val items = mapItems(pages = state.pages, isPageLoading = state.isPageLoading)
         return MainActivityModel(
             items = items,
-            isRefreshing = false
+            isRefreshing = false,
+            selectedFilter = state.repoFilter
         )
     }
 
