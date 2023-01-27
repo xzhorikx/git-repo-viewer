@@ -7,7 +7,11 @@ import alex.zhurkov.git_repo_viewer.feature.main.model.toItem
 
 class MainStateToModelMapper : StateToModelMapper<MainActivityState, MainActivityModel> {
     override fun mapStateToModel(state: MainActivityState): MainActivityModel {
-        val items = mapItems(pages = state.pages, isPageLoading = state.isPageLoading)
+        val items = mapItems(
+            pages = state.pages,
+            isPageLoading = state.isPageLoading,
+            favorites = state.favorites
+        )
         return MainActivityModel(
             items = items,
             isRefreshing = state.isRefreshing,
@@ -17,10 +21,11 @@ class MainStateToModelMapper : StateToModelMapper<MainActivityState, MainActivit
 
     private fun mapItems(
         pages: List<GitHubReposPage>,
-        isPageLoading: Boolean
+        isPageLoading: Boolean,
+        favorites: List<Long>
     ): List<GitHubRepoItem> {
         val items = pages.flatMap { page ->
-            page.repos.map { repo -> repo.toItem() }
+            page.repos.map { repo -> repo.toItem(isFavorite = repo.id in favorites) }
         }
         val loadingIndicators = when (isPageLoading) {
             true -> (0..7).map { GitHubRepoItem.Loading(id = "loading_$it") }

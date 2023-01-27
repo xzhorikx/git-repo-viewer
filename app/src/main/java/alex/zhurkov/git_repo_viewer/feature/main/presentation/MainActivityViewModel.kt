@@ -12,7 +12,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.CancellationException
@@ -47,7 +47,8 @@ class MainActivityViewModel(
         }
     }
 
-    override suspend fun provideChangesObservable(): Flow<MainActivityChange> = emptyFlow()
+    override suspend fun provideChangesObservable(): Flow<MainActivityChange> =
+        gitHubReposUseCase.observeFavorites().map { MainActivityChange.FavoritesChanged(it) }
 
     override fun processAction(action: MainActivityAction) {
         when (action) {
@@ -61,6 +62,20 @@ class MainActivityViewModel(
                 }
                 Unit
             }
+            is MainActivityAction.FavoriteClicked -> with(action.data) {
+                handleFavoriteClick(id = id.toLong(), isCurrentFavorite = isFavorite)
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        pageJob?.cancel()
+    }
+
+    private fun handleFavoriteClick(id: Long, isCurrentFavorite: Boolean) {
+        viewModelScope.launch(dispatcher) {
+            gitHubReposUseCase.saveFavorite(id = id, isFavorite = isCurrentFavorite.not())
         }
     }
 

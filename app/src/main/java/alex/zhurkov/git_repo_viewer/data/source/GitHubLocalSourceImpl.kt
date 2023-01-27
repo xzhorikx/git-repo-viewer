@@ -10,6 +10,8 @@ import alex.zhurkov.git_repo_viewer.domain.config.ConfigSource
 import alex.zhurkov.git_repo_viewer.domain.model.GitHubRepo
 import alex.zhurkov.git_repo_viewer.domain.model.GitHubReposPage
 import alex.zhurkov.git_repo_viewer.domain.model.RepoFilter
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class GitHubLocalSourceImpl(
     private val database: AppDatabase,
@@ -36,7 +38,7 @@ class GitHubLocalSourceImpl(
         limit: Int
     ): GitHubReposPage? {
         if (page <= 0) return null
-        val offset = (page -1) * configSource.pageSize
+        val offset = (page - 1) * configSource.pageSize
         val repos = database.repoDao().get(
             filter, limit = limit, offset = offset
         ).map(repoMapper::toModel).takeIf { it.isNotEmpty() } ?: return null
@@ -47,7 +49,7 @@ class GitHubLocalSourceImpl(
     }
 
     override suspend fun getFavorites(page: Int, limit: Int): GitHubReposPage? {
-        val offset = page * configSource.pageSize
+        val offset = (page - 1) * configSource.pageSize
         val repos = database.favoritesDao().get(limit = limit, offset = offset)
             .map(FavoriteRepoInfoEntity::repoEntity).map(repoMapper::toModel)
 
@@ -58,6 +60,9 @@ class GitHubLocalSourceImpl(
             repoFilter = RepoFilter.Favorites
         )
     }
+
+    override fun observeFavorites(): Flow<List<Long>> =
+        database.favoritesDao().observe().map { it.map(FavoriteRepoEntity::favRepoId) }
 
     override suspend fun addFavorite(repoId: Long) =
         database.favoritesDao().save(FavoriteRepoEntity(favRepoId = repoId))

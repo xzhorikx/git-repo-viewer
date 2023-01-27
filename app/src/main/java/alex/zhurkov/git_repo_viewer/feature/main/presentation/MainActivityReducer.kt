@@ -26,6 +26,7 @@ class MainActivityReducer : Reducer<MainActivityState, MainActivityChange> {
             }
             MainActivityChange.ItemsCleared -> state.copy(pages = emptyList())
             is MainActivityChange.LastVisibleItemChanged -> state.copy(lastVisibleItemId = change.id)
+            is MainActivityChange.FavoritesChanged -> state.copy(favorites = change.data)
         }
     }
 }

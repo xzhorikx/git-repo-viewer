@@ -13,17 +13,19 @@ sealed class GitHubRepoItem {
         val name: String,
         val url: String,
         val description: String?,
-        val stars: Int
+        val stars: Int,
+        val isFavorite: Boolean
     ) : GitHubRepoItem()
 
     data class Loading(override val id: String = UUID.randomUUID().toString()) : GitHubRepoItem()
 }
 
-fun GitHubRepo.toItem(): GitHubRepoItem.Data = GitHubRepoItem.Data(
+fun GitHubRepo.toItem(isFavorite: Boolean): GitHubRepoItem.Data = GitHubRepoItem.Data(
     id = id.toString(),
     owner = owner.toItem(),
     name = name,
     url = url,
     description = description.takeIf { it.isNotEmpty() },
-    stars = stars
+    stars = stars,
+    isFavorite = isFavorite
 )

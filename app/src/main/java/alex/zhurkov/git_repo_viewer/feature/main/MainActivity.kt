@@ -45,7 +45,8 @@ class MainActivity : ComponentActivity() {
                     viewModel.dispatch(MainActivityAction.LastVisibleItemChanged(id = it))
                 },
                 onClick = {},
-                onFilterSelected = { viewModel.dispatch(MainActivityAction.FilterSelected(it)) }
+                onFilterSelected = { viewModel.dispatch(MainActivityAction.FilterSelected(it)) },
+                onFavoriteClick =  { viewModel.dispatch(MainActivityAction.FavoriteClicked(it)) },
             )
         }
     }

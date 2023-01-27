@@ -10,7 +10,8 @@ data class MainActivityState(
     val isPageLoading: Boolean,
     val isRefreshing: Boolean,
     val repoFilter: RepoFilter,
-    val lastVisibleItemId: Long?
+    val lastVisibleItemId: Long?,
+    val favorites: List<Long>
 ) : UIState {
 
     companion object {
@@ -19,7 +20,8 @@ data class MainActivityState(
             isPageLoading = false,
             repoFilter = RepoFilter.TimeFrame.LastDay,
             isRefreshing = false,
-            lastVisibleItemId = null
+            lastVisibleItemId = null,
+            favorites = emptyList()
         )
     }
 

@@ -9,6 +9,7 @@ import alex.zhurkov.git_repo_viewer.domain.model.GitHubReposPage
 import alex.zhurkov.git_repo_viewer.domain.model.RepoFilter
 import alex.zhurkov.git_repo_viewer.domain.model.asIsoDateFromNow
 import alex.zhurkov.git_repo_viewer.domain.repository.GitHubRepoRepository
+import kotlinx.coroutines.flow.Flow
 
 private const val SORT_STARS = "stars"
 
@@ -35,6 +36,13 @@ class GitHubRepositoryImpl(
                 )
             }
         }
+    }
+
+    override fun observeFavorites(): Flow<List<Long>> = localSource.observeFavorites()
+
+    override suspend fun saveFavorite(id: Long, isFavorite: Boolean) = when (isFavorite) {
+        true -> localSource.addFavorite(id)
+        false -> localSource.removeFavorite(id)
     }
 
     private suspend fun getTimeframePage(

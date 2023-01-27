@@ -8,5 +8,5 @@ data class GitHubRepo(
     val description: String,
     val createdAt: String,
     val updatedAt: String,
-    val stars: Int
+    val stars: Int,
 )

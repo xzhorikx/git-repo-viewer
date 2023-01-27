@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -67,7 +68,8 @@ fun MainScreen(
     onPullToRefresh: () -> Unit,
     onLastItemVisible: (id: Long) -> Unit,
     onClick: (GitHubRepoItem.Data) -> Unit,
-    onFilterSelected: (RepoFilter) -> Unit
+    onFilterSelected: (RepoFilter) -> Unit,
+    onFavoriteClick: (GitHubRepoItem.Data) -> Unit
 ) {
     val model by uiModel.observeAsState()
     val scrollBehavior =
@@ -138,7 +140,8 @@ fun MainScreen(
                     renderModel = renderModel,
                     onPullToRefresh = onPullToRefresh,
                     onLastItemVisible = onLastItemVisible,
-                    onClick = onClick
+                    onClick = onClick,
+                    onFavoriteClick = onFavoriteClick
                 )
             }
         }
@@ -154,7 +157,8 @@ fun MainContent(
     renderModel: MainActivityModel,
     onPullToRefresh: () -> Unit,
     onLastItemVisible: (id: Long) -> Unit,
-    onClick: (GitHubRepoItem.Data) -> Unit
+    onClick: (GitHubRepoItem.Data) -> Unit,
+    onFavoriteClick: (GitHubRepoItem.Data) -> Unit
 ) {
     val pullToRefreshState =
         rememberPullRefreshState(renderModel.isRefreshing, onPullToRefresh)
@@ -189,7 +193,8 @@ fun MainContent(
                             RepositoryPreview(
                                 item,
                                 modifier = Modifier.fillMaxWidth(),
-                                onClick = onClick
+                                onClick = onClick,
+                                onFavoriteClick = onFavoriteClick
                             )
                         }
                         is GitHubRepoItem.Loading -> {
@@ -223,7 +228,8 @@ fun MainContent(
 fun RepositoryPreview(
     item: GitHubRepoItem.Data,
     modifier: Modifier = Modifier,
-    onClick: (GitHubRepoItem.Data) -> Unit
+    onClick: (GitHubRepoItem.Data) -> Unit,
+    onFavoriteClick: (GitHubRepoItem.Data) -> Unit
 ) {
     val context = LocalContext.current
     val imageLoader = remember {
@@ -239,6 +245,10 @@ fun RepositoryPreview(
         imageLoader = imageLoader,
         error = ColorPainter(Color.Black),
     )
+    @DrawableRes val iconFavoriteRes = when (item.isFavorite) {
+        true -> R.drawable.ic_favorite_filled
+        false -> R.drawable.ic_favorite
+    }
 
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
@@ -284,12 +294,21 @@ fun RepositoryPreview(
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_16)))
         Row {
             RepositoryDetail(
+                modifier = Modifier.weight(1f),
                 iconRes = R.drawable.ic_baseline_star_border_24,
                 title = item.stars.toString(),
                 body = stringResource(
                     id = R.string.stars
                 )
             )
+            IconButton(onClick = { onFavoriteClick(item) }) {
+                Icon(
+                    modifier = Modifier.size(dimensionResource(id = R.dimen.icon_repo_detail_size)),
+                    painter = painterResource(id = iconFavoriteRes),
+                    contentDescription = "$modifier",
+                    tint = colorResource(id = R.color.favorite)
+                )
+            }
         }
     }
 }
