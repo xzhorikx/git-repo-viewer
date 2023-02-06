@@ -62,7 +62,9 @@ class MainActivityViewModel(
     override fun processAction(action: MainActivityAction) {
         when (action) {
             is MainActivityAction.FilterSelected -> {
-                sendChange(MainActivityChange.FilterChanged(action.data))
+                if(action.data != state.repoFilter) {
+                    sendChange(MainActivityChange.FilterChanged(action.data))
+                }
             }
             MainActivityAction.Refresh -> refreshRepos()
             is MainActivityAction.LastVisibleItemChanged -> {
